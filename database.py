@@ -1,36 +1,84 @@
 import sqlite3
-connection = sqlite3.connect('budget_data.db')
-cursor = connection.cursor()
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS details (
-        id INTEGER PRIMARY KEY,
-        name TEXT,
-        mainIncome INTEGER,
-        secondIncome INTEGER,
-        sideIncome INTEGER,
-        expenses INTEGER,
-        housing INTEGER,
-        grocery INTEGER,
-        taxes INTEGER,
-        transportation INTEGER,
-        healthcare INTEGER,
-        entertainment INTEGER,
-        child INTEGER,
-        debt INTEGER,
-        other INTEGER,
-        totalIncome INTEGER  
-    )
-''')
 
-cursor.execute('''
-    INSERT INTO details (name,mainIncome,secondIncome,sideIncome,expenses,housing,grocery,taxes,transportation,healthcare,entertainment,child,debt,other,totalIncome) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-''', ('John Doe', 30, 20,20,40,00,100,100,103,10, 100, 120, 130, 140, 100))
+def connect_db():
+  connection = sqlite3.connect('budget_data.db')
+  return connection
 
-connection.commit()
+def create_table():
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS details (
+            id INTEGER PRIMARY KEY,
+            mainIncome INTEGER,
+            secondIncome INTEGER,
+            sideIncome INTEGER,
+            expenses INTEGER,
+            housing INTEGER,
+            grocery INTEGER,
+            taxes INTEGER, 
+            healthcare INTEGER,
+            entertainment INTEGER,
+            child INTEGER,
+            debt INTEGER,
+            other INTEGER,
+            totalIncome INTEGER  
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
-cursor.execute('SELECT * FROM details')
-rows = cursor.fetchall()
+def insert_user(main_income, secondary_income, side_income, expenses, housing, groceries,
+            taxes, healthcare, entertainment, child, debt, other, total_income):
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO details (mainIncome, secondIncome, sideIncome, expenses, housing, grocery, taxes, healthcare, entertainment, child, debt, other, totalIncome)  
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (main_income, secondary_income, side_income, expenses, housing, groceries,
+            taxes, healthcare, entertainment, child, debt, other, total_income))
+    conn.commit()
+    conn.close()     
 
-for row in rows:
-    print(row)
+def update_user(main_income, secondary_income, side_income, expenses, housing, groceries,
+                taxes, healthcare, entertainment, child, debt, other, total_income):
+    conn = connect_db()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        UPDATE details 
+        SET mainIncome=?, secondIncome=?, sideIncome=?, expenses=?, housing=?, 
+            grocery=?, taxes=?, healthcare=?, entertainment=?, child=?, debt=?, other=?, totalIncome=?
+        WHERE id = 1
+    ''', (main_income, secondary_income, side_income, expenses, housing, groceries,
+          taxes, healthcare, entertainment, child, debt, other, total_income))
+
+    conn.commit()
+    conn.close()
+
+def clear_table():
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM details")  
+    conn.commit()
+    conn.close()
+    print("Table cleared successfully.")
+
+def delete_table():
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute("DROP TABLE IF EXISTS details")
+    conn.commit()
+    conn.close()
+    print("Table cleared successfully.")
+
+def print_all_data():
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM details")
+    rows = cursor.fetchall()
+    for row in rows:
+        print(row)
+    conn.close()
+ 
+ 

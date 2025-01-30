@@ -1,31 +1,23 @@
 import tkinter as tk
 from tkinter import messagebox
-from tkinter import ttk
+from tkinter import ttk 
+import database 
 
 
-class infoForm:
+class InfoForm:
   def __init__(self, root):
-    self.root = root
-     # Create a frame to hold both left and right content
+    self.root = root 
     self.content_frame = tk.Frame(self.root)
     self.content_frame.grid(row=0, column=0, sticky="nsew")
-
-        # Configure the columns inside content_frame (left and right)
-    self.content_frame.grid_columnconfigure(0, weight=1, minsize=200)  # Left column
-    self.content_frame.grid_columnconfigure(1, weight=1, minsize=200)  # Right column
-
-        # Add content to the left column (for income details)
-    self.create_left_column()
-
-        # Add content to the right column (for right side widgets)
-    self.create_right_column()
-
-        # Configure row weights to allow resizing
+ 
+    self.content_frame.grid_columnconfigure(0, weight=1, minsize=200)  
+    self.content_frame.grid_columnconfigure(1, weight=1, minsize=200)   
+    self.create_left_column() 
+    self.create_right_column() 
     self.root.grid_rowconfigure(0, weight=1)
     self.root.grid_columnconfigure(0, weight=1)
 
-  def create_left_column(self):
-        # Left column widgets (income details)
+  def create_left_column(self): 
         self.income = tk.Label(self.content_frame, text="Income Sources", font=('Arial', 25, "bold"))
         self.income.grid(row=0, column=0, padx=10, pady=10, sticky="w")
 
@@ -49,14 +41,11 @@ class infoForm:
         self.sideIncomeEntry = tk.Entry(self.content_frame, font=('Arial', 16))
         self.sideIncomeEntry.insert(0,"$")
         self.sideIncomeEntry.grid(row=6, column=0, padx=10, pady=5, sticky="w")
-
-        #  self.separatorOne = ttk.Separator(self.root, orient='horizontal')
-    # self.separatorOne.pack(fill='x', pady=10)
+ 
 
 
 
-  def create_right_column(self):
-        # Right column widgets (expenses details)
+  def create_right_column(self): 
         self.expenses = tk.Label(self.content_frame, text="Expenses", font=('Arial', 25, "bold"))
         self.expenses.grid(row=0, column=1, padx=10, pady=10, sticky="w")
 
@@ -79,14 +68,7 @@ class infoForm:
         
         self.taxesEntry = tk.Entry(self.content_frame, font=('Arial', 16))
         self.taxesEntry.insert(0,"$")
-        self.taxesEntry.grid(row=6, column=1, padx=10, pady=5, sticky="w")
-
-        self.transportationLabel = tk.Label(self.content_frame, text="Car Payments/Gas/Transportation Costs", font=('Arial', 16))
-        self.transportationLabel.grid(row=7, column=1, padx=10, pady=10, sticky="w")
-        
-        self.transportationEntry = tk.Entry(self.content_frame, font=('Arial', 16))
-        self.transportationEntry.insert(0,"$")
-        self.transportationEntry.grid(row=8, column=1, padx=10, pady=5, sticky="w")
+        self.taxesEntry.grid(row=6, column=1, padx=10, pady=5, sticky="w") 
 
         self.healthcareLabel = tk.Label(self.content_frame, text="Health Care/Fitness", font=('Arial', 16))
         self.healthcareLabel.grid(row=9, column=1, padx=10, pady=10, sticky="w")
@@ -130,15 +112,16 @@ class infoForm:
         self.totalIncomeEntry.insert(0,"$")
         self.totalIncomeEntry.grid(row=20, column=1, padx=10, pady=5, sticky="w")
         
-        self.update_button = tk.Button(self.content_frame, text="Update", command=self.update_readonly_field)
+        self.update_button = tk.Button(self.content_frame, text="Calculate", command=self.update_readonly_field)
         self.update_button.grid(row=21, column=1, pady=10)
 
-    
-    
+        self.submit_button = tk.Button(self.content_frame, text="Submit", command=lambda:self.submit_data("submit"))
+        self.submit_button.grid(row=9, column=1, pady=10)
+ 
 
   def update_readonly_field(self, event=None): 
         incomeEntries = [self.salaryEntry,self.salaryTwoEntry,self.sideIncomeEntry]
-        expensesEntries = [self.otherEntry,self.debtEntry,self.childEntry,self.entEntry, self.healthcareEntry, self.transportationEntry, self.taxesEntry, self.groceryEntry, self.housingEntry]
+        expensesEntries = [self.otherEntry,self.debtEntry,self.childEntry,self.entEntry, self.healthcareEntry,  self.taxesEntry, self.groceryEntry, self.housingEntry]
 
         result = 0
         for x in incomeEntries:
@@ -149,19 +132,51 @@ class infoForm:
           x.delete(0,1)
           result -= int(x.get().replace(",",""))
  
-        self.totalIncomeEntry.config(state="normal")  # Temporarily enable editing
-        self.totalIncomeEntry.delete(0, tk.END)  # Clear previous content
+        self.totalIncomeEntry.config(state="normal") 
+        self.totalIncomeEntry.delete(0, tk.END)  
         self.totalIncomeEntry.insert(0, '$')
-        self.totalIncomeEntry.insert(1, result)  # Insert new result
-        self.totalIncomeEntry.config(state="readonly")  # Re-enable read-only mode
+        self.totalIncomeEntry.insert(1, result)  
+        self.totalIncomeEntry.config(state="readonly")   
+
+
+  def submit_data(self, type):
+    print (type)
+    try: 
+        main_income = int(self.salaryEntry.get().replace("$", ""))
+        secondary_income = int(self.salaryTwoEntry.get().replace("$", ""))
+        side_income = int(self.sideIncomeEntry.get().replace("$", ""))
+        housing = int(self.housingEntry.get().replace("$", ""))
+        groceries = int(self.groceryEntry.get().replace("$", ""))
+        taxes = int(self.taxesEntry.get().replace("$", ""))
+        healthcare = int(self.healthcareEntry.get().replace("$", ""))
+        entertainment = int(self.entEntry.get().replace("$", ""))
+        child = int(self.childEntry.get().replace("$", ""))
+        debt = int(self.debtEntry.get().replace("$", ""))
+        other = int(self.otherEntry.get().replace("$", ""))
+
+        # Calculate total income and expenses
+        expenses = housing + groceries + taxes + healthcare + entertainment + child + debt + other
+        total_income = main_income + secondary_income + side_income - expenses
+ 
+        database.update_user(
+            main_income, secondary_income, side_income, expenses, housing, groceries,
+            taxes, healthcare, entertainment, child, debt, other, total_income
+        )  
+        database.print_all_data()
+        messagebox.showinfo("Success", "Data submitted successfully!")
+
+    except ValueError:
+        messagebox.showerror("Error", "Please enter valid numeric values for all fields!")
+    except Exception as e:
+        messagebox.showerror("Error", f"An unexpected error occurred: {e}")
+  
+
 
 
 
 root=tk.Tk()
-app =infoForm(root)
-
- 
-
+app =InfoForm(root) 
+database.create_table()
 root.mainloop()  
 
  

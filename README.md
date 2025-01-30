@@ -1,2 +1,3 @@
 # financetracker
-Personal Finance Tracker to Help Me Lean &amp; Re-Learn Some Concepts
+
+Personal Finance Tracker to Help Me Learn &amp; Re-Learn Some Concepts
